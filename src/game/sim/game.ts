@@ -306,6 +306,11 @@ export class Game {
     this.flares = [];
     this.pickups = SPAWNS.map((sp) => {
       const c = tileCenter(sp.tx, sp.ty);
+      if (sp.locker) {
+        const d = lockerDir(sp.tx, sp.ty);
+        c.x += d.dx * (TILE / 2 - 0.4);
+        c.z += d.dz * (TILE / 2 - 0.4);
+      }
       return {
         id: sp.id,
         kind: sp.kind,
@@ -1067,6 +1072,18 @@ export class Game {
   get noiseObstacles() {
     return CLUTTER;
   }
+}
+
+/** Direction from a tile toward the wall a locker stands against. */
+export function lockerDir(tx: number, ty: number) {
+  const dirs = [
+    [0, -1],
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+  ];
+  for (const [dx, dz] of dirs) if (isSolidCell(cellAt(tx + dx, ty + dz))) return { dx, dz };
+  return { dx: 0, dz: -1 };
 }
 
 function lerpAngle(a: number, b: number, t: number) {
