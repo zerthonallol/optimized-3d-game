@@ -39,7 +39,8 @@ class Builder {
         const a1 = a0 + 1;
         const b0 = a0 + su + 1;
         const b1 = b0 + 1;
-        this.idx.push(a0, b0, a1, a1, b0, b1);
+        // winding so the face normal = cross(a, b)
+        this.idx.push(a0, a1, b0, a1, b1, b0);
       }
   }
 
@@ -100,18 +101,19 @@ export function buildLevel() {
         // wall face on edge, normal pointing back into this tile (-dx,-dy)
         const n = V(-dx, 0, -dy);
         let o: THREE.Vector3, a: THREE.Vector3;
+        // cross(a, up) must equal the inward normal
         if (dx === 1) {
-          o = V(x0 + T, bot, z0 + T);
-          a = V(0, 0, -T);
-        } else if (dx === -1) {
-          o = V(x0, bot, z0);
-          a = V(0, 0, T);
-        } else if (dy === 1) {
-          o = V(x0, bot, z0 + T);
-          a = V(T, 0, 0);
-        } else {
           o = V(x0 + T, bot, z0);
+          a = V(0, 0, T);
+        } else if (dx === -1) {
+          o = V(x0, bot, z0 + T);
+          a = V(0, 0, -T);
+        } else if (dy === 1) {
+          o = V(x0 + T, bot, z0 + T);
           a = V(-T, 0, 0);
+        } else {
+          o = V(x0, bot, z0);
+          a = V(T, 0, 0);
         }
         const b = V(0, hh, 0);
         const sv = solidN ? 4 : 1;
